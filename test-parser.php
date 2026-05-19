@@ -15,27 +15,17 @@ function now() {
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Salabanzi\LaravelScaffold\MigrationParser;
-use Salabanzi\LaravelScaffold\Generators\ModelGenerator;
-use Salabanzi\LaravelScaffold\Generators\ControllerGenerator;
-use Salabanzi\LaravelScaffold\Generators\RequestGenerator;
-use Salabanzi\LaravelScaffold\Generators\RouteGenerator;
-use Salabanzi\LaravelScaffold\Generators\FactoryGenerator;
-use Salabanzi\LaravelScaffold\Generators\SeederGenerator;
-use Salabanzi\LaravelScaffold\Generators\TestGenerator;
-use Salabanzi\LaravelScaffold\Generators\OpenApiGenerator;
+use Salabanzi\LaravelScaffold\Generators\PolicyGenerator;
+use Salabanzi\LaravelScaffold\Generators\ObserverGenerator;
+use Salabanzi\LaravelScaffold\Generators\EventGenerator;
 
 $parser  = new MigrationParser('C:/tmp/test-scaffold/create_posts_table.php');
-$options = ['force' => true, 'tests' => 'pest'];
+$options = ['force' => true];
 
 $generators = [
-    'Model'      => new ModelGenerator($parser, $options),
-    'Controller' => new ControllerGenerator($parser, $options),
-    'Request'    => new RequestGenerator($parser, $options),
-    'Route'      => new RouteGenerator($parser, $options),
-    'Factory'    => new FactoryGenerator($parser, $options),
-    'Seeder'     => new SeederGenerator($parser, $options),
-    'Test'       => new TestGenerator($parser, $options),
-    'OpenApi'    => new OpenApiGenerator($parser, $options),
+    'Policy'   => new PolicyGenerator($parser, $options),
+    'Observer' => new ObserverGenerator($parser, $options),
+    'Event'    => new EventGenerator($parser, $options),
 ];
 
 foreach ($generators as $name => $generator) {
@@ -47,4 +37,4 @@ foreach ($generators as $name => $generator) {
     }
 }
 
-echo "\n\nCouche 1 complete !\n";
+echo "\nCouche 4 complete !\n";
