@@ -6,26 +6,24 @@ function base_path(string $path = ''): string {
 
 function now() {
     return new class {
-        public function format(string $f): string {
-            return date($f);
-        }
+        public function format(string $f): string { return date($f); }
     };
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Salabanzi\LaravelScaffold\MigrationParser;
-use Salabanzi\LaravelScaffold\Generators\PolicyGenerator;
-use Salabanzi\LaravelScaffold\Generators\ObserverGenerator;
-use Salabanzi\LaravelScaffold\Generators\EventGenerator;
+use Salabanzi\LaravelScaffold\Generators\AuditReportGenerator;
+use Salabanzi\LaravelScaffold\Generators\ChangelogGenerator;
+use Salabanzi\LaravelScaffold\Generators\FilamentResourceGenerator;
 
 $parser  = new MigrationParser('C:/tmp/test-scaffold/create_posts_table.php');
-$options = ['force' => true];
+$options = ['force' => true, 'layers' => [1, 4, 5]];
 
 $generators = [
-    'Policy'   => new PolicyGenerator($parser, $options),
-    'Observer' => new ObserverGenerator($parser, $options),
-    'Event'    => new EventGenerator($parser, $options),
+    'AuditReport'      => new AuditReportGenerator($parser, $options),
+    'Changelog'        => new ChangelogGenerator($parser, $options),
+    'FilamentResource' => new FilamentResourceGenerator($parser, $options),
 ];
 
 foreach ($generators as $name => $generator) {
@@ -37,4 +35,4 @@ foreach ($generators as $name => $generator) {
     }
 }
 
-echo "\nCouche 4 complete !\n";
+echo "\nCouche 5 complete !\n";
