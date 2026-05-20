@@ -11,7 +11,7 @@ class RouteGenerator extends BaseGenerator
         $model      = $this->parser->getModelName();
         $plural     = Str::plural(Str::snake($model));
         $controller = "App\\Http\\Controllers\\Api\\{$model}Controller";
-        $routeBlock = "\nRoute::apiResource('{$plural}', {$controller}::class);\n";
+        $routeBlock = "\nRoute::middleware('auth:sanctum')->group(function () {\n    Route::apiResource('{$plural}', {$controller}::class);\n});\n";
         $apiPath    = base_path('routes/api.php');
         $files      = [];
 

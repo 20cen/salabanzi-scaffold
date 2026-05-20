@@ -58,7 +58,7 @@ test('can show {$var}', function () {
     \$this->actingAs(\$this->user)
         ->getJson("/api/{$plural}/{\${$var}->id}")
         ->assertOk()
-        ->assertJsonPath('data.id', \${$var}->id);
+        ->assertJsonPath('id', \${$var}->id);
 });
 
 test('can update {$var}', function () {
@@ -77,7 +77,7 @@ test('can delete {$var}', function () {
         ->deleteJson("/api/{$plural}/{\${$var}->id}")
         ->assertNoContent();
 
-    \$this->assertDatabaseMissing('{$plural}', ['id' => \${$var}->id]);
+    \$this->assertSoftDeleted('{$plural}', ['id' => \${$var}->id]);
 });
 
 test('requires authentication', function () {
@@ -146,7 +146,7 @@ class {$class} extends TestCase
         \$this->actingAs(\$this->user)
             ->getJson("/api/{$plural}/{\${$var}->id}")
             ->assertOk()
-            ->assertJsonPath('data.id', \${$var}->id);
+            ->assertJsonPath('id', \${$var}->id);
     }
 
     public function test_can_update_{$var}(): void
@@ -167,7 +167,7 @@ class {$class} extends TestCase
             ->deleteJson("/api/{$plural}/{\${$var}->id}")
             ->assertNoContent();
 
-        \$this->assertDatabaseMissing('{$plural}', ['id' => \${$var}->id]);
+        \$this->assertSoftDeleted('{$plural}', ['id' => \${$var}->id]);
     }
 
     public function test_requires_authentication(): void
