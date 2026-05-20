@@ -3,27 +3,28 @@
 namespace Salabanzi\LaravelScaffold\Commands;
 
 use Illuminate\Console\Command;
-use Salabanzi\LaravelScaffold\MigrationParser;
-use Salabanzi\LaravelScaffold\Support\FrontendDetector;
-use Salabanzi\LaravelScaffold\Generators\ModelGenerator;
-use Salabanzi\LaravelScaffold\Generators\ControllerGenerator;
-use Salabanzi\LaravelScaffold\Generators\RequestGenerator;
-use Salabanzi\LaravelScaffold\Generators\RouteGenerator;
-use Salabanzi\LaravelScaffold\Generators\FactoryGenerator;
-use Salabanzi\LaravelScaffold\Generators\SeederGenerator;
-use Salabanzi\LaravelScaffold\Generators\TestGenerator;
-use Salabanzi\LaravelScaffold\Generators\OpenApiGenerator;
-use Salabanzi\LaravelScaffold\Generators\PolicyGenerator;
-use Salabanzi\LaravelScaffold\Generators\ObserverGenerator;
-use Salabanzi\LaravelScaffold\Generators\EventGenerator;
-use Salabanzi\LaravelScaffold\Generators\TypeScriptSdkGenerator;
-use Salabanzi\LaravelScaffold\Generators\PostmanGenerator;
-use Salabanzi\LaravelScaffold\Generators\DockerGenerator;
-use Salabanzi\LaravelScaffold\Generators\GithubActionsGenerator;
-use Salabanzi\LaravelScaffold\Generators\FilamentResourceGenerator;
 use Salabanzi\LaravelScaffold\Generators\AuditReportGenerator;
 use Salabanzi\LaravelScaffold\Generators\ChangelogGenerator;
+use Salabanzi\LaravelScaffold\Generators\ControllerGenerator;
+use Salabanzi\LaravelScaffold\Generators\DockerGenerator;
+use Salabanzi\LaravelScaffold\Generators\EventGenerator;
+use Salabanzi\LaravelScaffold\Generators\FactoryGenerator;
+use Salabanzi\LaravelScaffold\Generators\FilamentResourceGenerator;
+use Salabanzi\LaravelScaffold\Generators\GithubActionsGenerator;
+use Salabanzi\LaravelScaffold\Generators\ModelGenerator;
+use Salabanzi\LaravelScaffold\Generators\ObserverGenerator;
+use Salabanzi\LaravelScaffold\Generators\OpenApiGenerator;
+use Salabanzi\LaravelScaffold\Generators\PolicyGenerator;
+use Salabanzi\LaravelScaffold\Generators\PostmanGenerator;
+use Salabanzi\LaravelScaffold\Generators\RequestGenerator;
 use Salabanzi\LaravelScaffold\Generators\ResourceGenerator;
+use Salabanzi\LaravelScaffold\Generators\RouteGenerator;
+use Salabanzi\LaravelScaffold\Generators\SeederGenerator;
+use Salabanzi\LaravelScaffold\Generators\TestGenerator;
+use Salabanzi\LaravelScaffold\Generators\TypeScriptSdkGenerator;
+use Salabanzi\LaravelScaffold\MigrationParser;
+use Salabanzi\LaravelScaffold\Support\FrontendDetector;
+use Salabanzi\LaravelScaffold\Support\TestsDetector;
 
 class ScaffoldGenerate extends Command
 {
@@ -129,7 +130,7 @@ class ScaffoldGenerate extends Command
             'force'     => $this->option('force'),
             'dry_run'   => $this->option('dry-run'),
             'frontend'  => $this->option('frontend') ?? FrontendDetector::detect(),
-            'tests'     => $this->option('tests')    ?? config('scaffold.tests.framework', 'pest'),
+            'tests'     => $this->option('tests')    ?? TestsDetector::detect(), // ← auto-détection
             'namespace' => config('scaffold.namespace', 'App'),
         ];
     }

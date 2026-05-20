@@ -36,7 +36,6 @@ class FrontendDetector
     private static function readJson(string $path): array
     {
         if (!file_exists($path)) return [];
-        $content = file_get_contents($path);
-        return json_decode($content, true) ?? [];
+        return json_decode(file_get_contents($path), true) ?? [];
     }
 }
