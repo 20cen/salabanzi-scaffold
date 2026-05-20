@@ -59,6 +59,7 @@ class {$model}Controller extends Controller
 
     public function destroy({$model} \${$var}): JsonResponse
     {
+        /** @var \Illuminate\Database\Eloquent\Model \${$var} */
         \${$var}->delete();
 
         return response()->json(null, 204);

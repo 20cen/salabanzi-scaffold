@@ -23,6 +23,7 @@ use Salabanzi\LaravelScaffold\Generators\GithubActionsGenerator;
 use Salabanzi\LaravelScaffold\Generators\FilamentResourceGenerator;
 use Salabanzi\LaravelScaffold\Generators\AuditReportGenerator;
 use Salabanzi\LaravelScaffold\Generators\ChangelogGenerator;
+use Salabanzi\LaravelScaffold\Generators\ResourceGenerator;
 
 class ScaffoldGenerate extends Command
 {
@@ -41,6 +42,7 @@ class ScaffoldGenerate extends Command
             ModelGenerator::class,
             ControllerGenerator::class,
             RequestGenerator::class,
+            ResourceGenerator::class,
             RouteGenerator::class,
             FactoryGenerator::class,
             SeederGenerator::class,
