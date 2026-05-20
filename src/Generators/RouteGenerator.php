@@ -8,11 +8,14 @@ class RouteGenerator extends BaseGenerator
 {
     public function generate(): array
     {
+        // Installe l'auth si nécessaire
+        $this->ensureAuthInstalled();
+
         $model      = $this->parser->getModelName();
         $plural     = Str::plural(Str::snake($model));
         $controller = "App\\Http\\Controllers\\Api\\{$model}Controller";
         $routeBlock = "\nRoute::middleware('auth:sanctum')->group(function () {\n    Route::apiResource('{$plural}', {$controller}::class);\n});\n";
-        $apiPath    = base_path('routes/api.php');
+        $apiPath    = base_path('routes/api.php'); 
         $files      = [];
 
         // Étape 1 — S'assure que routes/api.php est chargé dans bootstrap/app.php
@@ -47,6 +50,34 @@ PHP;
 
         $files[] = ['path' => 'routes/api.php', 'skipped' => false];
         return $files;
+    }
+
+    protected function ensureAuthInstalled(): void
+    {
+        if ($this->isDryRun()) return;
+
+        $composer = base_path('composer.json');
+        if (!file_exists($composer)) return;
+
+        $data = json_decode(file_get_contents($composer), true);
+        $deps = array_merge($data['require'] ?? [], $data['require-dev'] ?? []);
+
+        // Sanctum déjà installé
+        if (isset($deps['laravel/sanctum'])) return;
+
+        // Passport déjà installé
+        if (isset($deps['laravel/passport'])) return;
+
+        // JWT déjà installé
+        if (isset($deps['tymon/jwt-auth'])) return;
+
+        // Aucun auth installé → installe Sanctum automatiquement
+        $process = new \Symfony\Component\Process\Process(
+            ['php', 'artisan', 'install:api', '--no-interaction'],
+            base_path()
+        );
+        $process->setTimeout(120);
+        $process->run();
     }
 
     protected function ensureApiInBootstrap(): ?array
