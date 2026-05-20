@@ -3,22 +3,25 @@
 namespace Salabanzi\LaravelScaffold\Generators;
 
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
 
 class RouteGenerator extends BaseGenerator
 {
     public function generate(): array
     {
-        $model       = $this->parser->getModelName();
-        $plural      = Str::plural(Str::snake($model));
-        $controller  = "App\\Http\\Controllers\\Api\\{$model}Controller";
-        $routeBlock  = "\nRoute::apiResource('{$plural}', {$controller}::class);\n";
-        $apiPath     = base_path('routes/api.php');
+        $model      = $this->parser->getModelName();
+        $plural     = Str::plural(Str::snake($model));
+        $controller = "App\\Http\\Controllers\\Api\\{$model}Controller";
+        $routeBlock = "\nRoute::apiResource('{$plural}', {$controller}::class);\n";
+        $apiPath    = base_path('routes/api.php');
+        $files      = [];
 
-        // Installe les routes API si pas encore configurées
-        $this->ensureApiRoutesInstalled($apiPath);
+        // Étape 1 — S'assure que routes/api.php est chargé dans bootstrap/app.php
+        $bootstrapFile = $this->ensureApiInBootstrap();
+        if ($bootstrapFile) {
+            $files[] = $bootstrapFile;
+        }
 
-        // Si le fichier n'existe toujours pas on le crée
+        // Étape 2 — Crée ou met à jour routes/api.php
         if (!file_exists($apiPath)) {
             $content = <<<PHP
 <?php
@@ -26,13 +29,15 @@ class RouteGenerator extends BaseGenerator
 use Illuminate\\Support\\Facades\\Route;
 {$routeBlock}
 PHP;
-            return [$this->writeFile('routes/api.php', $content)];
+            $files[] = $this->writeFile('routes/api.php', $content);
+            return $files;
         }
 
-        // Si la route existe déjà on ne touche pas au fichier
+        // Si la route existe déjà — skip
         $existing = file_get_contents($apiPath);
         if (str_contains($existing, "'{$plural}'")) {
-            return [['path' => 'routes/api.php', 'skipped' => true]];
+            $files[] = ['path' => 'routes/api.php', 'skipped' => true];
+            return $files;
         }
 
         // Sinon on append la route
@@ -40,27 +45,37 @@ PHP;
             file_put_contents($apiPath, $existing . $routeBlock);
         }
 
-        return [['path' => 'routes/api.php', 'skipped' => false]];
+        $files[] = ['path' => 'routes/api.php', 'skipped' => false];
+        return $files;
     }
 
-    protected function ensureApiRoutesInstalled(string $apiPath): void
+    protected function ensureApiInBootstrap(): ?array
     {
-        // Vérifie si api.php est chargé dans bootstrap/app.php
         $bootstrapPath = base_path('bootstrap/app.php');
 
-        if (!file_exists($bootstrapPath)) return;
+        if (!file_exists($bootstrapPath)) return null;
 
-        $bootstrap = file_get_contents($bootstrapPath);
+        $content = file_get_contents($bootstrapPath);
 
-        // Si api.php est déjà référencé, rien à faire
-        if (str_contains($bootstrap, 'api')) return;
-
-        // Lance php artisan install:api automatiquement
-        if (!$this->isDryRun()) {
-            $process = new Process(['php', 'artisan', 'install:api', '--no-interaction']);
-            $process->setWorkingDirectory(base_path());
-            $process->setTimeout(60);
-            $process->run();
+        // Déjà configuré
+        if (str_contains($content, "'api'") || str_contains($content, '"api"')
+            || str_contains($content, 'api:')) {
+            return null;
         }
+
+        // Patch bootstrap/app.php — ajoute api: après web:
+        $patched = preg_replace(
+            "/(web:\s*__DIR__\.'\/\.\.\/routes\/web\.php',)/",
+            "$1\n        api: __DIR__.'/../routes/api.php',",
+            $content
+        );
+
+        if ($patched === $content) return null;
+
+        if (!$this->isDryRun()) {
+            file_put_contents($bootstrapPath, $patched);
+        }
+
+        return ['path' => 'bootstrap/app.php', 'skipped' => false];
     }
 }
