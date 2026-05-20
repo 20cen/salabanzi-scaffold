@@ -66,7 +66,7 @@ $layers = [
     ],
 ];
 
-$totalOk      = 0;
+$totalOk      = 0; 
 $totalSkipped = 0;
 
 foreach ($layers as $layerName => $generators) {
